@@ -27,8 +27,11 @@ player_cards = []
 
 while True:
 
+#background color
 	print(Back.RED)
 	print(Style.BRIGHT)
+	
+#user inputting name + intro
 	name = input("Name: ")
 	print("\n")
 	print(f"Welcome to SDN Blackjack {name}!!! Good luck and have fun! \n")
@@ -42,7 +45,8 @@ while True:
 		dealer_cards.append(CV0)
 		dealer_cards.append(CV1)
 		if len(dealer_cards) == 2:
-			print("Dealer has X &", dealer_cards[1])	
+			print("Dealer has X &", dealer_cards[1])
+	#changing face card to string value	
 		for index, value in enumerate(dealer_cards):
 			if value == 'JACK':
 				dealer_cards[index] = '10'
@@ -52,12 +56,15 @@ while True:
 				dealer_cards[index] = '10'
 			elif value == 'ACE':
 				dealer_cards[index] = '11'
-	#converting dealers cards to integers
+	#converting dealers cards to integers in new list
 		dealer_hand = [int(i) for i in dealer_cards]
-	#changing hand value for two ACES
+	#changing hand value for two ACES in intital deal
 	if sum(dealer_hand) == 22:
 		dealer_hand.clear()
 		dealer_hand.append(2)
+		for index, value in enumerate(dealer_cards):
+			if value == '11':
+				dealer_cards[index] = '1'
 					
 	#players initial hand			
 	while len(player_cards) != 2:
@@ -69,6 +76,7 @@ while True:
 		player_cards.append(CV1)
 		if len(player_cards) == 2:
 			print(f"You have {player_cards} \n")
+	#changing face card to string value	
 		for index, value in enumerate(player_cards):
 			if value == 'JACK':
 				player_cards[index] = '10'
@@ -78,9 +86,9 @@ while True:
 				player_cards[index] = '10'
 			elif value == 'ACE':
 				player_cards[index] = '11'
-	#converting players cards to integers
+	#converting players cards to integers in new list
 		player_hand = [int(i) for i in player_cards]
-
+	#Changing hand value for two ACES in intital deal
 	if sum(player_hand) == 22:
 		player_hand.clear()
 		player_hand.append(2)
@@ -106,6 +114,7 @@ while True:
 			break
 		else:
 			print("Invalid choice, please choose again")
+	#changing face card to string value	
 		for index, value in enumerate(player_cards):
 			if value == 'JACK':
 				player_cards[index] = '10'
@@ -114,6 +123,7 @@ while True:
 			elif value == 'KING':
 				player_cards[index] = '10'
 			elif value == 'ACE':
+		#changing ACE value if player hand value is over 10
 				if sum(player_hand) <= 10:
 					player_cards[index] = '11'
 				elif sum(player_hand) > 10:
@@ -121,9 +131,9 @@ while True:
 					for index, value in enumerate(player_cards):
 						if value == '11':
 							player_cards[index] = '1'
-		#converting players cards to integers			
+	#converting players cards to integers			
 		player_hand = [int(i) for i in player_cards]
-		#changing ACE value to 1 if player goes over 21 with ACES in hand
+	#changing ACE value to 1 if player goes over 21 with ACES in hand
 		if sum(player_hand) > 21:
 			for index, value in enumerate(player_hand):
 				if value == 11:
@@ -133,13 +143,14 @@ while True:
 					player_cards[index] = '1'
 		print(f"Your cards {player_cards} = {(str(sum(player_hand)))} \n")
 		
-	#if player stays under 21 and dealer hand value is under 17 scenarios		
-	if sum(player_hand) < 21:				
+#initiating dealer hits if value of hand is under 17 if player hand is 21 or less	
+	if sum(player_hand) <= 21:				
 		while sum(dealer_hand) < 17:
 			hitD = requests.get(HI, headers=headers, data=payload)
 			hitD_json = hitD.json()
 			HV0 = hitD_json['cards'][0]['value']
 			dealer_cards.append(HV0)
+		#changing face card to string value	
 			for index, value in enumerate(dealer_cards):
 				if value == 'JACK':
 					dealer_cards[index] = '10'
@@ -148,6 +159,7 @@ while True:
 				elif value == 'KING':
 					dealer_cards[index] = '10'
 				elif value == 'ACE':
+		#changing ACE value if dealer hand value is over 10
 					if sum(dealer_hand) <= 10:
 						dealer_cards[index] = '11'
 					elif sum(dealer_hand) > 10:
@@ -185,15 +197,6 @@ while True:
 			print(f"Dealer has a total of {(str(sum(dealer_hand)))} from {dealer_cards} \n")
 			print("The cards have been shuffled; total number of cards availble: ", shuffleD_json['remaining'], "\n")
 		
-	elif sum(dealer_hand) == 21:
-		#shuffle the deck
-		shuffleD = requests.get(SI, headers=headers, data=payload)
-		shuffleD_json = shuffleD.json()
-		print(f"{Fore.BLACK}DEALER HAS BLACKJACK! {Fore.RESET}\n ")	
-		print(f"{name} has a total of {(str(sum(player_hand)))} from {player_cards} \n")
-		print(f"Dealer has a total of {(str(sum(dealer_hand)))} from {dealer_cards} \n")
-		print("The cards have been shuffled; total number of cards availble: ", shuffleD_json['remaining'], "\n")
-		
 	elif sum(player_hand) > 21:
 		#shuffle the deck
 		shuffleD = requests.get(SI, headers=headers, data=payload)
@@ -210,6 +213,15 @@ while True:
 		print(f"{Fore.GREEN}DEALER BUSTS! {name} WINS! {Fore.RESET}\n")
 		print(f"{name} has a total of {(str(sum(player_hand)))} from {player_cards} \n")
 		print(f"Dealer has a total of {(str(sum(dealer_hand)))} from {dealer_cards} \n")	
+		print("The cards have been shuffled; total number of cards availble: ", shuffleD_json['remaining'], "\n")
+		
+	elif sum(dealer_hand) == 21:
+		#shuffle the deck
+		shuffleD = requests.get(SI, headers=headers, data=payload)
+		shuffleD_json = shuffleD.json()
+		print(f"{Fore.BLACK}DEALER HAS BLACKJACK! {Fore.RESET}\n ")	
+		print(f"{name} has a total of {(str(sum(player_hand)))} from {player_cards} \n")
+		print(f"Dealer has a total of {(str(sum(dealer_hand)))} from {dealer_cards} \n")
 		print("The cards have been shuffled; total number of cards availble: ", shuffleD_json['remaining'], "\n")
 
 	elif sum(dealer_hand) > sum(player_hand):
@@ -241,7 +253,7 @@ while True:
 		print("The cards have been shuffled; total number of cards availble: ", shuffleD_json['remaining'], "\n")
 		
 	
-
+#asking to play again
 	play_again = input(f"If you would like to play again, please enter 'y' or press any other character to end program: \n")
 	print(" ")
 	if play_again == "y" or play_again == "Y":
@@ -252,7 +264,7 @@ while True:
 		player_cards.clear()
 		continue
 	else:
-		print('Thanks for playing! ')
+		print(f"Thank you for playing {name}! Have a great day! \n")
 		print(Style.RESET_ALL)
 			
 		break
